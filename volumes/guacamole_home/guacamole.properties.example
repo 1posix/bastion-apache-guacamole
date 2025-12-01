@@ -1,0 +1,4 @@
+totp-issuer: bastion_totp
+totp-digits: 8
+totp-period: 20
+totp-mode: sha512

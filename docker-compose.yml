@@ -1,0 +1,81 @@
+networks:
+  guacamole_net:
+    driver: bridge
+
+services:
+  init:
+    build:
+      context: .
+      dockerfile: Dockerfile.init
+    container_name: guacamole_init
+    env_file: .env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./init:/app/init
+      - ./volumes:/app/volumes
+      - ./.initialized:/app/.initialized
+    networks:
+      - guacamole_net
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: guacamole_database
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - ./volumes/data:/var/lib/postgresql/data:rw
+      - ./init/initdb.sql:/docker-entrypoint-initdb.d/initdb.sql:ro
+    networks:
+      - guacamole_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      init:
+        condition: service_completed_successfully
+
+  guacd:
+    image: guacamole/guacd:1.5.3
+    container_name: guacamole_backend
+    restart: unless-stopped
+    networks:
+      - guacamole_net
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    volumes:
+      - ./volumes/drive:/drive:rw
+      - ./volumes/record:/var/lib/guacamole/recordings:rw
+
+  guacamole:
+    image: guacamole/guacamole:1.5.3
+    container_name: guacamole_frontend
+    restart: unless-stopped
+    ports:
+      - "${GUACAMOLE_PORT}:8080"
+    networks:
+      - guacamole_net
+    environment:
+      GUACD_HOSTNAME: ${GUACD_HOSTNAME}
+      POSTGRESQL_HOSTNAME: ${POSTGRESQL_HOSTNAME}
+      POSTGRESQL_DATABASE: ${POSTGRESQL_DATABASE}
+      POSTGRESQL_USER: ${POSTGRES_USER}
+      POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRESQL_AUTO_CREATE_ACCOUNTS: ${POSTGRESQL_AUTO_CREATE_ACCOUNTS}
+      GUACAMOLE_HOME: ${GUACAMOLE_HOME}
+      TOTP_ENABLED: ${TOTP_ENABLED:-true}
+    volumes:
+      - ./volumes/drive:/drive:rw
+      - ./volumes/record:/var/lib/guacamole/recordings:rw
+      - ./volumes/guacamole_home:/opt/guacamole_home:rw
+    depends_on:
+      postgres:
+        condition: service_healthy
+      guacd:
+        condition: service_started

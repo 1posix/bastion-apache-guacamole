@@ -1,0 +1,14 @@
+FROM docker:27-cli
+
+RUN apk add --no-cache \
+    bash \
+    wget \
+    tar \
+    curl
+
+WORKDIR /app
+
+COPY scripts/init.sh /app/init.sh
+RUN chmod +x /app/init.sh
+
+CMD ["/app/init.sh"]

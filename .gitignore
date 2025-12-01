@@ -1,0 +1,9 @@
+.env
+
+volumes/data/
+volumes/record/
+volumes/drive/
+
+init/initdb.sql
+*.log
+.initialized
