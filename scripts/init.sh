@@ -20,6 +20,9 @@ if [ -f /app/.initialized ]; then
     exit 0
 fi
 
+echo_info "Creation des dossiers des données"
+mkdir /app/volumes/{drive,record,data}
+
 echo_info "Creation du dossier init..."
 mkdir -p /app/init
 chmod -R +x /app/init
