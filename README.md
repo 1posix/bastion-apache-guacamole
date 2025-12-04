@@ -35,6 +35,11 @@ Cette solution offre une passerelle web **Clientless (HTML5)** pour l'administra
 
 ## Installation et Démarrage
 
+### 0. Installation docker
+
+[![Installer Docker](https://img.shields.io/badge/Script-Docker_Linux_Auto_Install-2496ED?style=flat-square&logo=docker&logoColor=white)](https://github.com/s4dic/dockerautoinstall)
+
+
 ### 1. Cloner le dépôt
 
 ```bash
@@ -95,7 +100,7 @@ Les données sont persistantes dans le dossier `./volumes` de l'hôte :
 * `./volumes/data` : Données PostgreSQL (Utilisateurs, connexions).
 * `./volumes/record` : Enregistrements vidéos des sessions (Audit).
 * `./volumes/drive` : Dossier pour le transfert de fichiers (Drive virtuel).
-* `./volumes/server.xml` : Configuration durcie de Tomcat.
+* `./volumes/tomcat/server.xml` : Configuration durcie de Tomcat.
 
 ## ⚠️ Avertissement de Production (Security Best Practices)
 
