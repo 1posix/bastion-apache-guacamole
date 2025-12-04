@@ -7,3 +7,5 @@ volumes/drive/
 init/initdb.sql
 *.log
 .initialized
+
+*.bak

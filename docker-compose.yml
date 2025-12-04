@@ -74,6 +74,7 @@ services:
       - ./volumes/drive:/drive:rw
       - ./volumes/record:/var/lib/guacamole/recordings:rw
       - ./volumes/guacamole_home:/opt/guacamole_home:rw
+      - ./volumes/tomcat/server.xml:/usr/local/tomcat/conf/server.xml:ro
     depends_on:
       postgres:
         condition: service_healthy
